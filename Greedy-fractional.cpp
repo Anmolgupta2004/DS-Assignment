@@ -1,4 +1,4 @@
-Author : Priyanshu Omer
+
 // #include<vector>
 // #include<map>
 // #include<algorithms>
