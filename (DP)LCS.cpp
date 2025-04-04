@@ -56,8 +56,7 @@ int main() {
 
 // ABCBDAB
 // BDCABA
-// LCS Length Table:
-// Direction Table :
+// LCS Length-Direction Table:
 // 0  0  0  0  0  0  0  
 // 0  0u 0u 0u 1d 1r 1d 
 // 0  1d 1r 1r 1u 2d 2r 
