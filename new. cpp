@@ -1,0 +1,90 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <queue>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+// Function to convert an integer to base-r string with fixed length
+string intToBase(int num, int base, int length) {
+    string res = "";
+    while (num > 0) {
+        res = char('0' + num % base) + res;
+        num /= base;
+    }
+    while (res.length() < length) res = '0' + res;
+    return res;
+}
+
+// Function to generate codeword lengths satisfying Kraft's inequality
+vector<int> generateLengths(int q, int r) {
+    vector<int> lengths(q);
+    int minLength = ceil(log(q) / log(r));
+    int total = 0;
+    for (int i = 0; i < q; ++i) lengths[i] = minLength;
+    
+    // Check Kraft's sum
+    double kraftSum = 0;
+    for (int i = 0; i < q; ++i) {
+        kraftSum += 1.0 / pow(r, lengths[i]);
+    }
+
+    // Adjust if kraftSum > 1
+    while (kraftSum > 1.0) {
+        for (int i = q - 1; i >= 0 && kraftSum > 1.0; --i) {
+            lengths[i]++;
+            kraftSum -= 1.0 / pow(r, lengths[i] - 1);
+            kraftSum += 1.0 / pow(r, lengths[i]);
+        }
+    }
+
+    return lengths;
+}
+
+// Generate prefix-free codes using canonical code logic
+vector<string> generateCodes(vector<int>& lengths, int radix) {
+    vector<pair<int, int>> symbolWithLength;
+    for (int i = 0; i < lengths.size(); ++i)
+        symbolWithLength.push_back({lengths[i], i});
+    
+    sort(symbolWithLength.begin(), symbolWithLength.end());
+
+    vector<string> codes(lengths.size());
+    int codeNum = 0;
+    int prevLength = symbolWithLength[0].first;
+
+    for (auto& [length, index] : symbolWithLength) {
+        if (length > prevLength) {
+            codeNum *= pow(radix, length - prevLength);
+            prevLength = length;
+        }
+        codes[index] = intToBase(codeNum, radix, length);
+        codeNum++;
+    }
+
+    return codes;
+}
+
+int main() {
+    int q = 50;
+    vector<int> radices = {2, 3, 4};
+
+    for (int r : radices) {
+        cout << "\n--- Radix: " << r << " ---\n";
+        vector<int> lengths = generateLengths(q, r);
+        vector<string> codes = generateCodes(lengths, r);
+
+        for (int i = 0; i < q; ++i) {
+            cout << "Symbol " << i + 1 << ": Code = " << codes[i] << "\n";
+        }
+
+        // Optional: print Kraft's sum
+        double kraftSum = 0;
+        for (int len : lengths) kraftSum += 1.0 / pow(r, len);
+        cout << "Kraft Sum: " << kraftSum << "\n";
+    }
+
+    return 0;
+}
