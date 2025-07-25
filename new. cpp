@@ -55,14 +55,17 @@ vector<string> generateCodes(vector<int>& lengths, int radix) {
     int codeNum = 0;
     int prevLength = symbolWithLength[0].first;
 
-    for (auto& [length, index] : symbolWithLength) {
-        if (length > prevLength) {
-            codeNum *= pow(radix, length - prevLength);
-            prevLength = length;
-        }
-        codes[index] = intToBase(codeNum, radix, length);
-        codeNum++;
+   for (const auto& pair : symbolWithLength) {
+    int length = pair.first;
+    int index = pair.second;
+
+    if (length > prevLength) {
+        codeNum *= static_cast<int>(pow(radix, length - prevLength));
+        prevLength = length;
     }
+    codes[index] = intToBase(codeNum, radix, length);
+    codeNum++;
+}
 
     return codes;
 }
